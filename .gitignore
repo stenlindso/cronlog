@@ -1,0 +1,19 @@
+# Python
+
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+env/
+Thumbs.db
+.Python
+.coverage
+.tox/
+htmlcov/
+venv/
+.mypy_cache/
+develop-eggs/
+*.egg
+.pytest_cache/
+.cache/
+build/
