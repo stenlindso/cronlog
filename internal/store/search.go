@@ -7,9 +7,9 @@ import (
 
 // SearchOptions controls how runs are searched.
 type SearchOptions struct {
-	Command    string // substring match on command
-	ExitCode   *int   // if set, filter by exit code
-	Limit      int    // max results, 0 = default 50
+	Command  string // substring match on command
+	ExitCode *int   // if set, filter by exit code
+	Limit    int    // max results, 0 = default 50
 }
 
 // Search returns runs matching the given options, ordered most recent first.
@@ -53,4 +53,24 @@ func Search(db *sql.DB, opts SearchOptions) ([]Run, error) {
 		runs = append(runs, r)
 	}
 	return runs, rows.Err()
+}
+
+// CountByExitCode returns the number of runs for each distinct exit code.
+// The result is a map from exit code to count.
+func CountByExitCode(db *sql.DB) (map[int]int, error) {
+	rows, err := db.Query("SELECT exit_code, COUNT(*) FROM runs GROUP BY exit_code")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	counts := make(map[int]int)
+	for rows.Next() {
+		var code, count int
+		if err := rows.Scan(&code, &count); err != nil {
+			return nil, err
+		}
+		counts[code] = count
+	}
+	return counts, rows.Err()
 }
