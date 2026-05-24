@@ -9,6 +9,10 @@ import (
 	"github.com/example/cronlog/internal/store"
 )
 
+// runRetention handles the "retention" subcommand, which manages data retention
+// policies for cron run logs. Policies can be scoped to a specific command or
+// applied globally (empty command). Use --add, --delete, or --apply to modify
+// policies; with no flag the current policies are listed.
 func runRetention(args []string) error {
 	fs := flag.NewFlagSet("retention", flag.ContinueOnError)
 	add := fs.Bool("add", false, "add or update a retention policy")
@@ -20,6 +24,10 @@ func runRetention(args []string) error {
 
 	if err := fs.Parse(args); err != nil {
 		return err
+	}
+
+	if *add && *del {
+		return fmt.Errorf("--add and --delete are mutually exclusive")
 	}
 
 	db, err := store.Open(defaultDBPath())
